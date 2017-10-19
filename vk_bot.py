@@ -3,7 +3,7 @@ import re
 import vk_api
 
 #   авторизация бота при помощи токена
-bot = vk_api.VkApi(token = '1b11cd4c7b293659f5d592eee2fcb14eb027589968b36e89192cd128248b4b647471594edf88c8249c445')
+bot = vk_api.VkApi(token = 'user_token')
 
 #   написать сообщение в чат или в лс
 def write_msg(userID, chatID, msg):
