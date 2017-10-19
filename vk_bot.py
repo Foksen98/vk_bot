@@ -2,9 +2,9 @@ import time
 import re
 import vk_api
 import json
-import re
+import random
 
-#   чтение конфигов, словаря и авторизация
+#   чтение конфигов
 def collect_settings():
     config_file = open("config.json", "r")
     config = json.loads(config_file.read())
@@ -13,7 +13,7 @@ def collect_settings():
 
 #   инициализация словаря
 def init_dictionary():
-    dict_file = open(config['dict_path'], "r")
+    dict_file = open(config['dict_path'], "r", encoding="utf8")
     dictionary = json.loads(dict_file.read())
     dict_file.close()
     return dictionary
@@ -50,14 +50,14 @@ def send_time(userID, chatID, msg):
     write_msg(userID, chatID, botTime)
 
 #   выбор ответа из словаря
-def give_answer(self, request):
-    section = self.get_section(request = request)
+def give_answer(request):
+    section = get_section(request = request)
     # answer = random.choice(self.dict['sections']['hate']['answers'])
     answer = random.choice(dictionary['sections'][section]['answers'])
     return answer
 
 #   определение группы вопроса
-def get_section(self, request):
+def get_section(request):
     request = request.lower()
     section_found = 'default'
     for section in dictionary['sections'].keys():
@@ -81,8 +81,9 @@ while True:
 
     for item in response['items']:
         userMsg = item['body'].lower()
-        for func in functions:
-            if check_user_msg(functions[func], userMsg):
-                func(item['user_id'], item.get('chat_id', 0), userMsg)
-
+        # for func in functions:
+        #     if check_user_msg(functions[func], userMsg):
+        #         func(item['user_id'], item.get('chat_id', 0), userMsg)
+        answer = give_answer(userMsg)
+        write_msg(item['user_id'], item.get('chat_id', 0), answer)
     time.sleep(1)
