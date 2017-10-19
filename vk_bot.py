@@ -1,18 +1,16 @@
 import time
 import re
-import vk as vk_api
+import vk_api
 import json
 
-#   чтение конфигов и словаря
+#   чтение конфигов, словаря и авторизация
 def collect_settings():
     config_file = open("config.json", "r")
     config = json.loads(config_file.read())
     config_file.close()
+    return config
 
-    dict_file = open(config['dict_path'], "r")
-    dictionary = json.loads(dict_file.read())
-    dict_file.close()
-
+config = collect_settings()
 #   авторизация бота при помощи токена
 bot = vk_api.VkApi(token = config['access_token'])
 
