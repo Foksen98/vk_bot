@@ -2,6 +2,7 @@ import time
 import re
 import vk_api
 import json
+import re
 
 #   чтение конфигов, словаря и авторизация
 def collect_settings():
@@ -10,9 +11,17 @@ def collect_settings():
     config_file.close()
     return config
 
+#   инициализация словаря
+def init_dictionary():
+    dict_file = open(config['dict_path'], "r")
+    dictionary = json.loads(dict_file.read())
+    dict_file.close()
+    return dictionary
+
 config = collect_settings()
 #   авторизация бота при помощи токена
 bot = vk_api.VkApi(token = config['access_token'])
+dictionary = init_dictionary()
 
 #   написать сообщение в чат или в лс
 def write_msg(userID, chatID, msg):
@@ -39,6 +48,24 @@ def send_greeting(userID, chatID, msg):
 def send_time(userID, chatID, msg):
     botTime = time.ctime()
     write_msg(userID, chatID, botTime)
+
+#   выбор ответа из словаря
+def give_answer(self, request):
+    section = self.get_section(request = request)
+    # answer = random.choice(self.dict['sections']['hate']['answers'])
+    answer = random.choice(dictionary['sections'][section]['answers'])
+    return answer
+
+#   определение группы вопроса
+def get_section(self, request):
+    request = request.lower()
+    section_found = 'default'
+    for section in dictionary['sections'].keys():
+        for question in dictionary['sections'][section]['questions']:
+            if re.findall(r'{}'.format(question), request):
+                section_found = section
+                break
+    return section_found
 
 #  списки и словари
 values = {'out': 0,'count': 200,'time_offset': 10}
