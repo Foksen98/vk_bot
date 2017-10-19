@@ -1,9 +1,20 @@
 import time
 import re
 import vk as vk_api
+import json
+
+#   чтение конфигов и словаря
+def collect_settings():
+    config_file = open("config.json", "r")
+    config = json.loads(config_file.read())
+    config_file.close()
+
+    dict_file = open(config['dict_path'], "r")
+    dictionary = json.loads(dict_file.read())
+    dict_file.close()
 
 #   авторизация бота при помощи токена
-bot = vk_api.VkApi(token = 'user_token')
+bot = vk_api.VkApi(token = config['access_token'])
 
 #   написать сообщение в чат или в лс
 def write_msg(userID, chatID, msg):
