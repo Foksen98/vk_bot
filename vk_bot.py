@@ -3,6 +3,8 @@ import re
 import vk_api
 import json
 import random
+import xml.dom.minidom
+import requests
 
 #   чтение конфигов
 def collect_settings():
@@ -52,8 +54,11 @@ def send_time(userID, chatID, msg):
 #   выбор ответа из словаря
 def give_answer(request):
     section = get_section(request = request)
+    if section == "wolfram":
+        answer = interact_with_wolfram(request[12:], config['wolfram_app_id'])
     # answer = random.choice(self.dict['sections']['hate']['answers'])
-    answer = random.choice(dictionary['sections'][section]['answers'])
+    else:
+        answer = random.choice(dictionary['sections'][section]['answers'])
     return answer
 
 #   определение группы вопроса
@@ -67,13 +72,25 @@ def get_section(request):
                 break
     return section_found
 
+def interact_with_wolfram(query, app_id):
+    request = "http://api.wolframalpha.com/v2/query?input={}&appid={}".format(query, app_id)
+    response = requests.get(request)
+    dom = xml.dom.minidom.parseString(response.content);
+    dom.normalize()
+    try:
+        node = dom.getElementsByTagName("img")[2]
+        value = node.getAttribute("title")
+    except:
+        value = "Ой, что-то не работает, сорян!"    
+    return value
+
 #  списки и словари
 values = {'out': 0,'count': 200,'time_offset': 10}
 sendGreetingDict = {'привет', 'ку'}
 sendTimeDict = {'время', 'времени'}
 functions = {send_greeting: sendGreetingDict, send_time: sendTimeDict}
 
-#   основная часть
+#  основная часть
 while True:
     response = bot.method('messages.get', values)
     if response['items']:
